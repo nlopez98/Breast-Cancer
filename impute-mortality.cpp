@@ -35,11 +35,11 @@ int schedule_death(NumericVector individualdata, int age, int year_now,
   }
   
   //brca https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8075208/
-  if(individualdata[199] > 0){
-    if(individualdata[202] > 0){
-      if(individualdata[203] > 0){
-        if(individualdata[204] > 0){
-          if(individualdata[205] > 0){
+  if(individualdata[200] > 0){
+    if(individualdata[203] > 0){
+      if(individualdata[204] > 0){
+        if(individualdata[205] > 0){
+          if(individualdata[206] > 0){
             mortalityrates[2] = 0.268; //stage 4
           } else {
             mortalityrates[2] = 0.083; //stage 3
