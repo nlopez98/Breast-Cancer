@@ -354,7 +354,11 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
   // Copy DBP values from dbpoveryears to individualdata
   std::copy(dbpoveryears.begin(), dbpoveryears.end(), individualdata.begin() + 12 + 2 * (YEAR_UNTIL - 1990 + 1));
   
-  return individualdata;
+  return Rcpp::List::create(
+  Rcpp::Named("individualdata") = individualdata,
+  Rcpp::Named("value_198") = individualdata[198]
+);
+
 }
 
 
@@ -423,19 +427,30 @@ NumericMatrix schedule_population(int ncol, int begin, int end, bool nsc, int AG
   //     if(remainder(indiv,10000) == 0) cout << indiv << endl;
   // });
   
-  
-  for(int indiv=begin; indiv < end; ++indiv)
-  {
+  NumericVector all_values_198(end - begin);
+
+  for(int indiv = begin; indiv < end; ++indiv)
+{
     if(indiv % 50000 == 0) cout << indiv << endl;
-    NumericVector thisindividual(ncol);
-    thisindividual = schedule_individual(index[indiv], yearborn[indiv], yearimmigrated[indiv], yearemigrated[indiv], ncol, 
-                                         birthmatrix,  fertility_rates_new, mortality_cube,
-                                         bmitable, bptable, heightbmi,prefrailty,frailty, amiinc, strokeinc, amimort, strokemort, ckd5mort, nsc, AGE_MAX, YEAR_UNTIL);
-    for(int col=0; col<ncol; ++col)
+
+    // Call function and retrieve result as a List
+    Rcpp::List result = schedule_individual(index[indiv], yearborn[indiv], yearimmigrated[indiv], yearemigrated[indiv], 
+                                            ncol, birthmatrix, fertility_rates_new, mortality_cube,
+                                            bmitable, bptable, heightbmi, prefrailty, frailty, amiinc, strokeinc, 
+                                            amimort, strokemort, ckd5mort, nsc, AGE_MAX, YEAR_UNTIL);
+
+    // Extract individual data
+    NumericVector thisindividual = result["individualdata"];
+    double value_198 = result["value_198"];  // Extract value at index 198
+
+    // Store in matrix
+    for(int col = 0; col < ncol; ++col)
     {
-      populationmatrix(indiv-begin,col) = thisindividual[col];
+        populationmatrix(indiv - begin, col) = thisindividual[col];
     }
-  }
+  all_values_198[indiv - begin] = value_198;
+}
+
   global["birthmatrix"] = birthmatrix;
   
   return populationmatrix;
