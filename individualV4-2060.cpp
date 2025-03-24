@@ -176,88 +176,84 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
         individualdata[9]=schedule_frailty(frailty,year_got_dm, yearborn, year_now, index, yearPF);
       }
       
-      if (gender == 1){
-        if (individualdata[197] == 0 && age == 49){
+      if (gender == 1) {
+        if (individualdata[197] == 0 && age == 49) {
           individualdata[197] = 1;
         }
-        if (individualdata[198] == 0){
-          if (individualdata[197] == 0){
+        
+       // if (individualdata[198] == 0) {
+          if (individualdata[197] == 0) {
             double sd;
-            switch(race)
-            {
-            case 0: 
-              sd = 0.5*(34.3-30.3)/1.96*sqrt(120);
+            switch (race) {
+            case 0:
+              sd = 0.5 * (34.3 - 30.3) / 1.96 * sqrt(120);
               individualdata[198] = Rcpp::rnorm(1, 32.3, sd)[0];
               break;
             case 1:
-              sd = 0.5*(29.8-25.5)/1.96*sqrt(90);
+              sd = 0.5 * (29.8 - 25.5) / 1.96 * sqrt(90);
               individualdata[198] = Rcpp::rnorm(1, 27.6, sd)[0];
               break;
-            case 2: 
-              sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
+            case 2:
+              sd = 0.5 * (29.4 - 25.2) / 1.96 * sqrt(98);
               individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
               break;
             case 3:
-              sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
+              sd = 0.5 * (29.4 - 25.2) / 1.96 * sqrt(98);
               individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
               break;
             }
           }
-        }
-        if (individualdata[197] == 1){
-          double sd;
-          switch(race)
-          {
-          case 0:
-            sd = 0.5*(25.5-21.1)/1.96*sqrt(85);
-            individualdata[198] = Rcpp::rnorm(1, 23.3, sd)[0];
-            break;
-          case 1:
-            sd = 0.5*(22.5-16.5)/1.96*sqrt(42);
-            individualdata[198] = Rcpp::rnorm(1, 19.5, sd)[0];
-            break;
-          case 2: 
-            sd = 0.5*(21.9-18)/1.96*sqrt(101);
-            individualdata[198] = Rcpp::rnorm(1, 20, sd)[0];
-            break;
-          case 3:
-            sd = 0.5*(21.9-18)/1.96*sqrt(101);
-            individualdata[198] = Rcpp::rnorm(1, 20, sd)[0];
-            break;
+       // }
+        
+        
+        
+      //  if(individualdata[199] == 0){
+          if (individualdata[197] == 1) {
+            double sd;
+            switch (race) {
+            case 0:
+              sd = 0.5 * (25.5 - 21.1) / 1.96 * sqrt(85);
+              individualdata[199] = Rcpp::rnorm(1, 23.3, sd)[0];
+              break;
+            case 1:
+              sd = 0.5 * (22.5 - 16.5) / 1.96 * sqrt(42);
+              individualdata[199] = Rcpp::rnorm(1, 19.5, sd)[0];
+              break;
+            case 2:
+              sd = 0.5 * (21.9 - 18) / 1.96 * sqrt(101);
+              individualdata[199] = Rcpp::rnorm(1, 20, sd)[0];
+              break;
+            case 3:
+              sd = 0.5 * (21.9 - 18) / 1.96 * sqrt(101);
+              individualdata[199] = Rcpp::rnorm(1, 20, sd)[0];
+              break;
+            }
           }
-        }
-        if (individualdata[197] == 0){
-          double sd;
-          switch(race)
-          {
-          case 0: 
-            sd = 0.5*(34.3-30.3)/1.96*sqrt(120);
-            individualdata[198] = Rcpp::rnorm(1, 32.3, sd)[0];
-            break;
-          case 1:
-            sd = 0.5*(29.8-25.5)/1.96*sqrt(90);
-            individualdata[198] = Rcpp::rnorm(1, 27.6, sd)[0];
-            break;
-          case 2: 
-            sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
-            individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
-            break;
-          case 3:
-            sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
-            individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
-            break;
+      //  }
+        if(individualdata[200] == 0){
+          if (individualdata[199] != 0){
+            individualdata[200] = schedule_breastcancer(index, bmi_trajectory, individualdata[199], age, year_now, individualdata[201], individualdata[202], individualdata[200]);
+          }
+          if (individualdata[199] == 0){
+            individualdata[200] = schedule_breastcancer(index, bmi_trajectory, individualdata[198], age, year_now, individualdata[201], individualdata[202], individualdata[200]);
           }
         }
         
         
-        individualdata[199]=schedule_breastcancer(index, bmi_trajectory, individualdata[198], age, year_now, individualdata[200], individualdata[201], individualdata[199]);
-        if(individualdata[199] > 0){
-          if (individualdata[202] == 0 && individualdata[199] < year_now){individualdata[202]=schedule_stage1(year_now);} //Stage 1 year
-          if (individualdata[203] == 0 && individualdata[202] > 0 && individualdata[202] < year_now){individualdata[203]=schedule_stage2(year_now, individualdata[202]);} //Stage 2 year, don't roll until 1 year lag
-          if (individualdata[204] == 0 && individualdata[203] > 0 && individualdata[203] < year_now){individualdata[204]=schedule_stage3(year_now, individualdata[203]);} //Stage 3 year
-          if (individualdata[205] == 0 && individualdata[204] > 0 && individualdata[204] < year_now){individualdata[205]=schedule_stage4(year_now, individualdata[204]);} //Stage 4 year
+        if (individualdata[200] > 0) {
+          if (individualdata[203] == 0 && individualdata[200] < year_now) {
+            individualdata[203] = schedule_stage1(year_now);
+          }
+          if (individualdata[204] == 0 && individualdata[203] > 0 && individualdata[203] < year_now) {
+            individualdata[204] = schedule_stage2(year_now, individualdata[203]);
+          }
+          if (individualdata[205] == 0 && individualdata[204] > 0 && individualdata[204] < year_now) {
+            individualdata[205] = schedule_stage3(year_now, individualdata[204]);
+          }
+          if (individualdata[206] == 0 && individualdata[205] > 0 && individualdata[205] < year_now) {
+            individualdata[206] = schedule_stage4(year_now, individualdata[205]);
+          }
         }
-        
       }
     } 
     // end of if(age >= 18)
@@ -313,10 +309,10 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
                 age_first_child = age;
               }
               ++number_children;
-              if (individualdata[200] == 0){
-                individualdata[200] = age;
+              if (individualdata[201] == 0){
+                individualdata[201] = age;
               }
-              individualdata[201] = number_children;
+              individualdata[202] = number_children;
             }
           }
         }   
