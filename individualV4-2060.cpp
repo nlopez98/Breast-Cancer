@@ -21,6 +21,7 @@
 #include <impute-normal_hypertension.cpp>
 #include <impute-highnormal_hypertension.cpp>
 #include <impute-hypertensive_hypertension.cpp>
+#include <random>
 #include <omp.h>
 using namespace Rcpp;
 
@@ -165,7 +166,6 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
         individualdata[6]=schedule_stroke(year_got_dm, yearborn, year_now, index, strokeinc);
       }
       
-      
       if(individualdata[8]==0){
         individualdata[8]=schedule_prefrailty(prefrailty,year_got_dm, yearborn, year_now, index );
       }
@@ -177,86 +177,79 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
       }
       
       if (gender == 1){
-        if (individualdata[197] == 0 && age == 49){
+        std::default_random_engine gen(std::random_device{}());
+        std::normal_distribution<double> menopause_age(49.0, (0.43 / 1.96) * std::sqrt(656)); //from paper
+        if (individualdata[197] == 0 && std::round(menopause_age(gen)) == age) {
           individualdata[197] = 1;
+          individualdata[206] = individualdata[198];
+          if (individualdata[197] == 1){
+           // individualdata[198] = Rcpp::rnorm(1, 18.85, 10.19)[0];
+            // double sd;
+            // switch(race)
+            // {
+            // case 0:
+            //   sd = 0.5*(25.5-21.1)/1.96*sqrt(85);
+            //   individualdata[198] = Rcpp::rnorm(1, 23.3, sd)[0];
+            //   break;
+            // case 1:
+            //   sd = 0.5*(22.5-16.5)/1.96*sqrt(42);
+            //   individualdata[198] = Rcpp::rnorm(1, 19.5, sd)[0];
+            //   break;
+            // case 2: 
+            //   sd = 0.5*(21.9-18)/1.96*sqrt(101);
+            //   individualdata[198] = Rcpp::rnorm(1, 20, sd)[0];
+            //   break;
+            // case 3:
+            //   sd = 0.5*(21.9-18)/1.96*sqrt(101);
+            //   individualdata[198] = Rcpp::rnorm(1, 20, sd)[0];
+            //   break;
+            // }
+          }
+          
         }
         if (individualdata[198] == 0){
-          if (individualdata[197] == 0){
-            double sd;
-            switch(race)
-            {
-            case 0: 
-              sd = 0.5*(34.3-30.3)/1.96*sqrt(120);
-              individualdata[198] = Rcpp::rnorm(1, 32.3, sd)[0];
-              break;
-            case 1:
-              sd = 0.5*(29.8-25.5)/1.96*sqrt(90);
-              individualdata[198] = Rcpp::rnorm(1, 27.6, sd)[0];
-              break;
-            case 2: 
-              sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
-              individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
-              break;
-            case 3:
-              sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
-              individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
-              break;
-            }
-          }
-        }
-        if (individualdata[197] == 1){
-          double sd;
-          switch(race)
-          {
-          case 0:
-            sd = 0.5*(25.5-21.1)/1.96*sqrt(85);
-            individualdata[198] = Rcpp::rnorm(1, 23.3, sd)[0];
-            break;
-          case 1:
-            sd = 0.5*(22.5-16.5)/1.96*sqrt(42);
-            individualdata[198] = Rcpp::rnorm(1, 19.5, sd)[0];
-            break;
-          case 2: 
-            sd = 0.5*(21.9-18)/1.96*sqrt(101);
-            individualdata[198] = Rcpp::rnorm(1, 20, sd)[0];
-            break;
-          case 3:
-            sd = 0.5*(21.9-18)/1.96*sqrt(101);
-            individualdata[198] = Rcpp::rnorm(1, 20, sd)[0];
-            break;
-          }
-        }
-        if (individualdata[197] == 0){
-          double sd;
-          switch(race)
-          {
-          case 0: 
-            sd = 0.5*(34.3-30.3)/1.96*sqrt(120);
-            individualdata[198] = Rcpp::rnorm(1, 32.3, sd)[0];
-            break;
-          case 1:
-            sd = 0.5*(29.8-25.5)/1.96*sqrt(90);
-            individualdata[198] = Rcpp::rnorm(1, 27.6, sd)[0];
-            break;
-          case 2: 
-            sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
-            individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
-            break;
-          case 3:
-            sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
-            individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
-            break;
-          }
+          // if (individualdata[197] == 0){
+          //   double sd;
+          //   switch(race)
+          //   {
+          //   case 0: 
+          //     sd = 0.5*(34.3-30.3)/1.96*sqrt(120);
+          //     individualdata[198] = Rcpp::rnorm(1, 32.3, sd)[0];
+          //     individualdata[206] = individualdata[198];
+          //     break;
+          //   case 1:
+          //     sd = 0.5*(29.8-25.5)/1.96*sqrt(90);
+          //     individualdata[198] = Rcpp::rnorm(1, 27.6, sd)[0];
+          //     individualdata[206] = individualdata[198];
+          //     break;
+          //   case 2: 
+          //     sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
+          //     individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
+          //     individualdata[206] = individualdata[198];
+          //     break;
+          //   case 3:
+          //     sd = 0.5*(29.4-25.2)/1.96*sqrt(98);
+          //     individualdata[198] = Rcpp::rnorm(1, 27.3, sd)[0];
+          //     individualdata[206] = individualdata[198];
+          //     break;
+          //   }
+          // }
+          individualdata[198] = Rcpp::rnorm(1, 18.85, 10.19)[0];
         }
         
         
-        individualdata[199]=schedule_breastcancer(index, bmi_trajectory, individualdata[198], age, year_now, individualdata[200], individualdata[201], individualdata[199]);
-        if(individualdata[199] > 0){
-          if (individualdata[202] == 0 && individualdata[199] < year_now){individualdata[202]=schedule_stage1(year_now);} //Stage 1 year
-          if (individualdata[203] == 0 && individualdata[202] > 0 && individualdata[202] < year_now){individualdata[203]=schedule_stage2(year_now, individualdata[202]);} //Stage 2 year, don't roll until 1 year lag
-          if (individualdata[204] == 0 && individualdata[203] > 0 && individualdata[203] < year_now){individualdata[204]=schedule_stage3(year_now, individualdata[203]);} //Stage 3 year
-          if (individualdata[205] == 0 && individualdata[204] > 0 && individualdata[204] < year_now){individualdata[205]=schedule_stage4(year_now, individualdata[204]);} //Stage 4 year
-        }
+        
+        if(individualdata[199]==0){individualdata[199]=schedule_breastcancer(index, bmi_trajectory, individualdata[198], age, year_now, individualdata[200], individualdata[201], individualdata[199]);
+          ;}
+        if(individualdata[199] > 0 && individualdata[202] == 0){
+          IntegerVector stage_years = schedule_all_stages(year_now, age, individualdata[199], index);
+          individualdata[202] = individualdata[199];
+          individualdata[203] = stage_years[0]; // Stage 2 year
+          individualdata[204] = stage_years[1]; // Stage 3 year
+          individualdata[205] = stage_years[2]; // Stage 4 year
+          individualdata[208] = stage_years[3]
+;        }
+        
         
       }
     } 
@@ -266,19 +259,25 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
     if(year_now >= yearimmigrated && year_now <= yearemigrated)
     {
       //After 1990 (for ciitizen) or year of immigration (for immigrants), allow individuals to die + make children
-      // min of year immmigrated is 1991 for immigrants, but for citizens it's 0, thus necessitating the checking of year_now >= 1990																			 
-      if(year_now >= 1990)
-      {
-        if (year_now > yearimmigrated && year_now >= 1991) {
+      // min of year immmigrated is 1991 for immigrants, but for citizens it's 0, thus necessitating the checking of year_now >= 1990                    
+      if (year_now >= 1991){
+        basemortality = mortality_cube(index, yearborn-1870, year_now-1990); // min mortality_rates$year_of_birth = 1870, 
+        // min mortality_rates$year_of_death = 1990
+        basemortality = mortmod(basemortality, individualdata[5], individualdata[6], individualdata[7], year_now, index);
+      } else{basemortality= 0;}
           //calculate annual mortality rate starting from 1990 to check if person is alive
-          basemortality = mortality_cube(index, yearborn-1870, year_now-1990); // min mortality_rates$year_of_birth = 1870, 
-          // min mortality_rates$year_of_death = 1990
-          basemortality = mortmod(basemortality, individualdata[5], individualdata[6], individualdata[7], year_now, index);
-          year_of_death = schedule_death(individualdata, age, year_now, basemortality, amimort, strokemort, ckd5mort, index);
+         
+          year_of_death = schedule_death(individualdata, age, year_now, basemortality, amimort, strokemort, ckd5mort, index, individualdata[4], individualdata[5], individualdata[6],yearemigrated);
           individualdata[0] = year_of_death;
-          
-          if(year_of_death > 0) break;
-          
+          individualdata[207] = get_year_bc_death();
+
+          if(year_of_death > 0) 
+          {
+            break;}
+    
+        if(year_now >= 1960)
+        {
+          if (year_now > yearimmigrated && year_now >= 1961) {   
           //check if this individual can make a child, and update the yearborn and index vectors accordingly
           //gender = abs(remainder(index,2));
           
@@ -290,7 +289,7 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
             race = int(index/2);
             int col_index = (age-15)/5; // age is integer, so col_index will be as well
             
-            basefertility = fertility_rates_new((year_now-1990), col_index);
+            basefertility = fertility_rates_new((year_now-1960), col_index);
             
             
             have_child = schedule_child(basefertility, year_now, race); 
@@ -302,10 +301,10 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
               switch(have_child)
               {
                 //daughter
-              case(1): birthmatrix(year_now - 1991, (race * 2) + 1) += 1;  // Right now only the first 60 rows are populated
+              case(1): birthmatrix(year_now - 1961, (race * 2) + 1) += 1;  // Right now only the first 60 rows are populated
                 break;
                 //son
-              case(2): birthmatrix(year_now - 1991, (race * 2)) += 1;      // Right now only the first 60 rows are populated
+              case(2): birthmatrix(year_now - 1961, (race * 2)) += 1;      // Right now only the first 60 rows are populated
                 break;
               }
               if (number_children == 0)
@@ -324,6 +323,8 @@ NumericVector schedule_individual(int index, int yearborn, int yearimmigrated, i
     }
     //end of one year cycle
   }
+  
+  
   // reach here either age = 120, or year_now > 2050, or year_of_death > 0
   
   
@@ -402,7 +403,7 @@ NumericMatrix schedule_population(int ncol, int begin, int end, bool nsc, int AG
   
   
   //birthmatrix is the birth counts by [yearborn(1991-2051), ethgen]
-  IntegerMatrix birthmatrix(61,8); // index
+  IntegerMatrix birthmatrix(91,8); // index
   
   //Matrices of the number of overweight and obese individuals [yearnow(1990-2050) * age(18-100), Ethgen(8)]
   // initial values are 0 so no need to pass from R environment, also these matrices are computed in Cpp to be returned to R
